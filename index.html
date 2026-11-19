@@ -90,7 +90,7 @@ button { cursor: pointer; }
 #scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; background: var(--chat); }
 #msgs { padding-block: 8px 20px; padding-left: var(--gl); padding-right: var(--gr); }
 .date { display: flex; justify-content: center; margin: 14px 0 6px; }
-#floatDate { position: sticky; top: 8px; z-index: 3; height: 0; display: flex; justify-content: center; pointer-events: none; overflow: visible; }
+#floatDate { position: sticky; top: 8px; z-index: 3; height: 0; display: flex; justify-content: center; align-items: flex-start; pointer-events: none; overflow: visible; }
 #floatDate span { margin-top: 0; }
 .date span, .sys span, #floatDate span { padding: 3px 12px; border-radius: 999px; background: var(--pill); color: var(--pill-fg); font-size: 12px; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .sys { display: flex; justify-content: center; margin: 8px 0; }
