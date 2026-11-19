@@ -89,8 +89,10 @@ button { cursor: pointer; }
 #hitCount { flex: none; min-width: 4.5em; text-align: center; font-size: 12px; color: var(--sub); font-variant-numeric: tabular-nums; }
 #scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; background: var(--chat); }
 #msgs { padding-block: 8px 20px; padding-left: var(--gl); padding-right: var(--gr); }
-.date { position: sticky; top: 8px; z-index: 2; display: flex; justify-content: center; margin: 14px 0 6px; pointer-events: none; }
-.date span, .sys span { padding: 3px 12px; border-radius: 999px; background: var(--pill); color: var(--pill-fg); font-size: 12px; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.date { display: flex; justify-content: center; margin: 14px 0 6px; }
+#floatDate { position: sticky; top: 8px; z-index: 3; height: 0; display: flex; justify-content: center; pointer-events: none; overflow: visible; }
+#floatDate span { margin-top: 0; }
+.date span, .sys span, #floatDate span { padding: 3px 12px; border-radius: 999px; background: var(--pill); color: var(--pill-fg); font-size: 12px; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .sys { display: flex; justify-content: center; margin: 8px 0; }
 .sys span { border-radius: 12px; text-align: center; max-width: 86%; overflow-wrap: anywhere; }
 .row { display: flex; gap: 8px; align-items: flex-start; margin-top: 10px; }
@@ -170,7 +172,7 @@ mark { background: var(--mark); color: inherit; border-radius: 3px; }
         <input id="jump" type="date">
       </div>
     </div>
-    <div id="scroll"><div id="msgs"></div></div>
+    <div id="scroll"><div id="floatDate" aria-hidden="true" hidden><span></span></div><div id="msgs"></div></div>
     <button class="icon" id="toBottom" aria-label="いちばん新しい所へ" hidden><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
   </section>
 
@@ -410,6 +412,7 @@ function parseTalk(raw) {
     var sc = $('scroll');
     var below = sc.scrollHeight - sc.scrollTop - sc.clientHeight;
     $('toBottom').hidden = below < 300 && win.e >= items.length;
+    floatDate();
     if (busy) return;
     busy = true;
     if (sc.scrollTop < 700 && win.s > 0) {
@@ -423,12 +426,24 @@ function parseTalk(raw) {
     }
     busy = false;
   }
+  /* いま上端に見えている日付を、上の札に出す */
+  function floatDate() {
+    var sc = $('scroll'), kids = $('msgs').children, top = sc.getBoundingClientRect().top + 24;
+    var lo = 0, hi = kids.length - 1, f = -1;
+    while (lo <= hi) { var mid = (lo + hi) >> 1; if (kids[mid].getBoundingClientRect().bottom > top) { f = mid; hi = mid - 1; } else lo = mid + 1; }
+    var box = $('floatDate');
+    if (f < 0 || sc.scrollTop < 4) { box.hidden = true; return; }
+    var it = items[+kids[f].dataset.i];
+    box.hidden = !it || it.t === 'date';
+    if (it) box.firstChild.textContent = dateLabel(it.date);
+  }
   function jumpTo(i, flash) {
     draw(Math.max(0, i - 80), Math.min(items.length, i + 120));
     var node = $('msgs').querySelector('[data-i="' + i + '"]');
     if (!node) return;
     var sc = $('scroll');
-    sc.scrollTop = Math.max(0, node.offsetTop - (flash ? sc.clientHeight / 3 : 8));
+    sc.scrollTop = 0;
+    sc.scrollTop = Math.max(0, node.getBoundingClientRect().top - sc.getBoundingClientRect().top - (flash ? sc.clientHeight / 3 : 8));
     if (flash) node.classList.add('flash');
     onScroll();
   }

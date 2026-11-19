@@ -1,6 +1,6 @@
 // 電波がなくても開けるように、アプリの部品を端末にしまっておく。
 // トークの中身はここでは扱わない（端末の保存場所 IndexedDB にだけ入る）。
-var CACHE = 'talk-app-v1';
+var CACHE = 'talk-app-v2';
 var FILES = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', function (e) {
